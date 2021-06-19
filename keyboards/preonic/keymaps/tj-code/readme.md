@@ -3,3 +3,4 @@
 ## todos
 - [ ] add more shortcuts
 - [ ] add more directions to wiggler
+- [ ] implement shortcut for debug output
