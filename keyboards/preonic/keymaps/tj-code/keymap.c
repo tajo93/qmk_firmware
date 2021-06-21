@@ -37,32 +37,29 @@ enum preonic_keycodes {
     RAISE,
     QWERTY,
     WORKMAN,
-    WIN_TAB,
-    WIGGLER
+    JIGGLER,
 };
 
-enum wiggle_directions {
+enum jiggle_directions {
     LEFT,
-    RIGHT
+    DOWN,
+    RIGHT,
+    UP
 };
 
-int char_count    = 0;
-int last_word_len = 0;
-bool is_alt_tab_active = false;
-uint16_t alt_tab_timer = 0;
-bool wiggler = false;
-uint16_t wiggle_direction = LEFT;
-uint16_t wiggle_timer = 0;
+bool jiggler = false;
+uint16_t jiggle_direction = LEFT;
+uint16_t jiggle_timer = 0;
 
-enum combos {
-    COMBO_DELETE_WORD
-};
-
-const uint16_t PROGMEM combo_delete_word[] = {KC_D, KC_W, COMBO_END};
-
-combo_t key_combos[COMBO_COUNT] = {
-    [COMBO_DELETE_WORD] = COMBO_ACTION(combo_delete_word)
-};
+const char *inttostr(int n) {
+    char *result;
+    if (n >= 0)
+        result = malloc(floor(log10(n)) + 2);
+    else
+        result = malloc(floor(log10(n)) + 3);
+    sprintf(result, "%d", n);
+    return result;
+}
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -140,51 +137,50 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * `-----------------------------------------------------------------------------------'
      */
     [_RAISE] = LAYOUT_preonic_grid(
-        KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_BSPC,
-        KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_DEL,
-        KC_DEL, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_MINS, KC_EQL, KC_LBRC, KC_RBRC, KC_BSLS,
-        _______, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, KC_NUHS, KC_NUBS, LCA(KC_MINUS), LCA(KC_UNDERSCORE), _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______),
+        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,          KC_0,               KC_BSPC,
+        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,          KC_0,               KC_DEL,
+        KC_DEL,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_MINS, KC_EQL,  KC_LBRC,       KC_RBRC,            KC_BSLS,
+        _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_NUHS, KC_NUBS, LCA(KC_MINUS), LCA(KC_UNDERSCORE), _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,       _______,            _______),
 
     [_NAV] = LAYOUT_preonic_grid(
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, KC_PGDN, KC_UP,   KC_PGUP, KC_HOME, _______, _______, _______, KC_WH_D, KC_MS_U, KC_WH_U, _______,
-        _______, KC_LEFT, KC_DOWN, KC_RIGHT, KC_END, _______, _______, KC_BTN1, KC_MS_L, KC_MS_D, KC_MS_R, KC_BTN2,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_BTN3, _______, _______,
-        _______, _______, WIN_TAB, _______, _______, _______, _______, _______, _______, _______, _______, _______),
+        _______, _______, _______, _______,    _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, KC_PGDN, KC_UP,   KC_PGUP,    KC_HOME, _______, _______, _______, _______, _______, _______, _______,
+        _______, KC_LEFT, KC_DOWN, KC_RIGHT,   KC_END,  _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______,    _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, MO(_MOUSE), _______, _______, _______, _______, _______, _______, _______, _______),
 
     [_FN] = LAYOUT_preonic_grid(
-        _______, _______, _______, _______, _______, KC_SLCK, KC_NLCK, KC_P7,   KC_P8,   KC_P9,   KC_PPLS, _______,
-        _______, KC_MUTE, KC_MPRV, KC_MNXT, _______, _______, _______, KC_P4,   KC_P5,   KC_P6,   KC_PMNS, _______,
-        _______, KC_VOLU, KC_MSTP, KC_MPLY, _______, _______, _______, KC_P1,   KC_P2,   KC_P3,   KC_PAST, _______,
-        KC_CAPS, KC_VOLD, _______, _______, _______, _______, _______, KC_P0,   KC_PCMM, KC_PDOT, KC_PSLS, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_PENT),
+        _______,    _______, _______, _______, _______, KC_SLCK, KC_NLCK, KC_P7,   KC_P8,   KC_P9,   KC_PPLS, _______,
+        _______,    KC_MUTE, KC_MPRV, KC_MNXT, _______, _______, _______, KC_P4,   KC_P5,   KC_P6,   KC_PMNS, _______,
+        MO(_MOUSE), KC_VOLU, KC_MSTP, KC_MPLY, _______, _______, _______, KC_P1,   KC_P2,   KC_P3,   KC_PAST, _______,
+        KC_CAPS,    KC_VOLD, _______, _______, _______, _______, _______, KC_P0,   KC_PCMM, KC_PDOT, KC_PSLS, _______,
+        _______,    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_PENT),
 
     [_MENU] = LAYOUT_preonic_grid(
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, DM_REC1, DM_PLY1, _______, _______, _______, _______, _______, _______, _______, WIGGLER, _______,
-        DM_RSTP, DM_REC2, DM_PLY2, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______),
+        _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
+        _______, DM_REC1, DM_PLY1, _______, _______,  _______, _______, _______, _______, _______, JIGGLER, _______,
+        DM_RSTP, DM_REC2, DM_PLY2, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______),
 
     [_ADJUST] = LAYOUT_preonic_grid(
-        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,
-        _______, RESET,   DEBUG, EEP_RST, _______, _______, _______, _______, RGB_TOG, RGB_RMOD, RGB_MOD, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, RGB_HUI, RGB_SAI, RGB_VAI, _______,
-        _______, QWERTY, WORKMAN, _______, _______, _______, _______, _______, RGB_HUD, RGB_SAD, RGB_VAD, _______,
+        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  _______,
+        _______, RESET,   DEBUG,  EEP_RST,  _______, _______, _______, _______, RGB_TOG, RGB_RMOD, RGB_MOD, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, RGB_HUI, RGB_SAI, RGB_VAI,  _______,
+        _______, QWERTY, WORKMAN,  _______, _______, _______, _______, _______, RGB_HUD, RGB_SAD, RGB_VAD,  _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,  _______),
+
+    [_MOUSE] = LAYOUT_preonic_grid(
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, KC_WH_D, KC_MS_U, KC_WH_U, _______,
+        _______, _______, _______, _______, _______, _______, _______, KC_BTN1, KC_MS_L, KC_MS_D, KC_MS_R, KC_BTN2,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_BTN3, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______)
 
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    if (record->event.pressed) {
-        if (keycode >= 4 && keycode <= 39) {
-            char_count++;
-        } else {
-            last_word_len = char_count;
-            char_count    = 0;
-        }
-    }
     switch (keycode) {
         case QWERTY:
             if (record->event.pressed) {
@@ -214,45 +210,23 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 update_tri_layer(_LOWER, _RAISE, _ADJUST);
             }
             break;
-        case WIN_TAB:
+        case JIGGLER:
             if (record->event.pressed) {
-                if (!is_alt_tab_active) {
-                    is_alt_tab_active = true;
-                    register_code(KC_LALT);
-                }
-                alt_tab_timer = timer_read();
-                register_code(KC_TAB);
-            } else {
-                unregister_code(KC_TAB);
-            }
-            break;
-        case WIGGLER:
-            if (record->event.pressed) {
-                wiggler = !wiggler;
-                if (!wiggler) {
+                jiggler = !jiggler;
+                if (!jiggler) {
                     unregister_code(KC_MS_LEFT);
                     unregister_code(KC_MS_RIGHT);
+                    unregister_code(KC_MS_DOWN);
+                    unregister_code(KC_MS_UP);
                 } else {
-                    wiggle_timer = timer_read();
+                    jiggle_timer = timer_read();
                 }
             }
+            break;
+        return false;
     }
     return true;
 };
-
-void process_combo_event(uint16_t combo_index, bool pressed) {
-    switch (combo_index) {
-        case COMBO_DELETE_WORD:
-            if (pressed) {
-                last_word_len += char_count - 1;
-                while (last_word_len > 0) {
-                    tap_code(KC_BSPACE);
-                    last_word_len--;
-                }
-            }
-            break;
-    }
-}
 
 bool     muse_mode      = false;
 uint8_t  last_muse_note = 0;
@@ -331,26 +305,32 @@ void matrix_scan_user(void) {
         // open camunda imported dir for businesskei in clipboard
         SEQ_TWO_KEYS(KC_C, KC_O) { SEND_STRING(SS_LGUI(SS_TAP(X_R)) "\\\\p081\\ddmppl\\prod\\_camundaImported\\" SS_RCTL(SS_TAP(X_V)) SS_TAP(X_ENTER)); }
     }
-    // WIN TAB TIMER
-    if (is_alt_tab_active) {
-        if (timer_elapsed(alt_tab_timer) > 1000) {
-            unregister_code(KC_LALT);
-            is_alt_tab_active = false;
-        }
-    }
-    // WIGGLE TIMER
-    if (wiggler) {
-        if (timer_elapsed(wiggle_timer) > 1000) {
-            wiggle_timer = 0;
-            wiggle_timer = timer_read();
-            if (wiggle_direction == LEFT) {
-                unregister_code(KC_MS_RIGHT);
-                register_code(KC_MS_LEFT);
-                wiggle_direction = RIGHT;
-            } else {
-                unregister_code(KC_MS_LEFT);
-                register_code(KC_MS_RIGHT);
-                wiggle_direction = LEFT;
+    // JIGGLE TIMER
+    if (jiggler) {
+        if (timer_elapsed(jiggle_timer) > 1000) {
+            jiggle_timer = 0;
+            jiggle_timer = timer_read();
+
+            jiggle_direction++;
+            jiggle_direction = jiggle_direction > UP ? 0 : jiggle_direction;
+
+            switch (jiggle_direction) {
+                case LEFT:
+                    unregister_code(KC_MS_UP);
+                    register_code(KC_MS_LEFT);
+                    break;
+                case DOWN:
+                    unregister_code(KC_MS_LEFT);
+                    register_code(KC_MS_DOWN);
+                    break;
+                case RIGHT:
+                    unregister_code(KC_MS_DOWN);
+                    register_code(KC_MS_RIGHT);
+                    break;
+                case UP:
+                    unregister_code(KC_MS_RIGHT);
+                    register_code(KC_MS_UP);
+                    break;
             }
         }
     }
@@ -384,12 +364,3 @@ bool music_mask_user(uint16_t keycode) {
     }
 }
 
-const char *inttostr(int n) {
-    char *result;
-    if (n >= 0)
-        result = malloc(floor(log10(n)) + 2);
-    else
-        result = malloc(floor(log10(n)) + 3);
-    sprintf(result, "%d", n);
-    return result;
-}

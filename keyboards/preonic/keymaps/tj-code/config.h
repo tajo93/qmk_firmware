@@ -32,8 +32,6 @@
 /* override number of MIDI tone keycodes (each octave adds 12 keycodes and allocates 12 bytes) */
 //#define MIDI_TONE_KEYCODE_OCTAVES 2
 
-#define COMBO_COUNT 1
-#define COMBO_TERM 300
 #define TAPPING_TERM 200
 #define LEADER_TIMEOUT 200
 #define LEADER_PER_KEY_TIMING
