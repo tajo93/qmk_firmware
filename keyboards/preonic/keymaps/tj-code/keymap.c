@@ -17,11 +17,14 @@
 #include QMK_KEYBOARD_H
 #include "muse.h"
 
+static char* SECRET = "thisisonlyfortest";
+
 #define ESCNAV LT(_NAV, KC_ESC)
 
 enum preonic_layers {
     _QWERTY,
     _WORKMAN,
+    _SWP_BSPC,
     _LOWER,
     _RAISE,
     _NAV,
@@ -38,6 +41,7 @@ enum preonic_keycodes {
     QWERTY,
     WORKMAN,
     JIGGLER,
+    ESC_BSP
 };
 
 enum jiggle_directions {
@@ -77,11 +81,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * `-----------------------------------------------------------------------------------'
      */
     [_QWERTY] = LAYOUT_preonic_grid(
-        KC_GRV,           KC_1,    KC_2,    KC_3,    KC_4,  KC_5,   KC_6,   KC_7,  KC_8,    KC_9,    KC_0,      KC_BSPC,
-        KC_TAB,           KC_Q,    KC_W,    KC_E,    KC_R,  KC_T,   KC_Y,   KC_U,  KC_I,    KC_O,    KC_P,      KC_DEL,
-        LT(_NAV, KC_ESC), KC_A,    KC_S,    KC_D,    KC_F,  KC_G,   KC_H,   KC_J,  KC_K,    KC_L,    KC_SCLN,   KC_QUOT,
-        KC_LSPO,          KC_Z,    KC_X,    KC_C,    KC_V,  KC_B,   KC_N,   KC_M,  KC_COMM, KC_DOT,  KC_SLSH,   KC_RSPC,
-        KC_LCTL,          KC_LGUI, KC_LALT, MO(_FN), LOWER, KC_SPC, KC_SPC, RAISE, KC_LEAD, KC_RALT, MO(_MENU), RCTL_T(KC_ENT)),
+        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,  KC_5,             KC_6,             KC_7,  KC_8,    KC_9,    KC_0,      KC_BSPC,
+        KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,  KC_T,             KC_Y,             KC_U,  KC_I,    KC_O,    KC_P,      KC_DEL,
+        KC_ESC,  KC_A,    KC_S,    KC_D,    KC_F,  KC_G,             KC_H,             KC_J,  KC_K,    KC_L,    KC_SCLN,   KC_QUOT,
+        KC_LSPO, KC_Z,    KC_X,    KC_C,    KC_V,  KC_B,             KC_N,             KC_M,  KC_COMM, KC_DOT,  KC_SLSH,   KC_RSPC,
+        KC_LCTL, KC_LGUI, KC_LALT, MO(_FN), LOWER, LT(_NAV, KC_SPC), LT(_NAV, KC_SPC), RAISE, KC_LEAD, KC_RALT, MO(_MENU), RCTL_T(KC_ENT)),
 
     /* Workman
      * ,-----------------------------------------------------------------------------------.
@@ -97,11 +101,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * `-----------------------------------------------------------------------------------'
      */
     [_WORKMAN] = LAYOUT_preonic_grid(
-        KC_GRV,           KC_1,    KC_2,    KC_3,    KC_4,  KC_5,   KC_6,   KC_7,  KC_8,    KC_9,    KC_0,      KC_BSPC,
-        KC_TAB,           KC_Q,    KC_D,    KC_R,    KC_W,  KC_B,   KC_J,   KC_F,  KC_U,    KC_P,    KC_SCLN,   KC_DEL,
-        LT(_NAV, KC_ESC), KC_A,    KC_S,    KC_H,    KC_T,  KC_G,   KC_Y,   KC_N,  KC_E,    KC_O,    KC_I,      KC_QUOT,
-        KC_LSPO,          KC_Z,    KC_X,    KC_M,    KC_C,  KC_V,   KC_K,   KC_L,  KC_COMM, KC_DOT,  KC_SLSH,   KC_RSPC,
-        KC_LCTL,          KC_LGUI, KC_LALT, MO(_FN), LOWER, KC_SPC, KC_SPC, RAISE, KC_LEAD, KC_RALT, MO(_MENU), RCTL_T(KC_ENT)),
+        KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,  KC_5,             KC_6,             KC_7,  KC_8,    KC_9,    KC_0,      KC_BSPC,
+        KC_TAB,  KC_Q,    KC_D,    KC_R,    KC_W,  KC_B,             KC_J,             KC_F,  KC_U,    KC_P,    KC_SCLN,   KC_DEL,
+        KC_ESC,  KC_A,    KC_S,    KC_H,    KC_T,  KC_G,             KC_Y,             KC_N,  KC_E,    KC_O,    KC_I,      KC_QUOT,
+        KC_LSPO, KC_Z,    KC_X,    KC_M,    KC_C,  KC_V,             KC_K,             KC_L,  KC_COMM, KC_DOT,  KC_SLSH,   KC_RSPC,
+        KC_LCTL, KC_LGUI, KC_LALT, MO(_FN), LOWER, LT(_NAV, KC_SPC), LT(_NAV, KC_SPC), RAISE, KC_LEAD, KC_RALT, MO(_MENU), RCTL_T(KC_ENT)),
+
+    [_SWP_BSPC] = LAYOUT_preonic_grid(
+        KC_GESC, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        KC_BSPC, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______),
 
     /* Lower
      * ,-----------------------------------------------------------------------------------.
@@ -158,17 +169,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_PENT),
 
     [_MENU] = LAYOUT_preonic_grid(
-        _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
-        _______, DM_REC1, DM_PLY1, _______, _______,  _______, _______, _______, _______, _______, JIGGLER, _______,
-        DM_RSTP, DM_REC2, DM_PLY2, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, _______),
+        _______, _______, _______, _______, _______,  _______, _______,       _______, _______, _______, _______, _______,
+        _______, DM_REC1, DM_PLY1, _______, _______,  _______, TG(_SWP_BSPC), _______, _______, _______, JIGGLER, _______,
+        DM_RSTP, DM_REC2, DM_PLY2, _______, _______,  _______, _______,       _______, _______, _______, _______, _______,
+        _______, QWERTY,  WORKMAN, _______, _______,  _______, _______,       _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______,  _______, _______,       _______, _______, _______, _______, _______),
 
     [_ADJUST] = LAYOUT_preonic_grid(
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  _______,
-        _______, RESET,   DEBUG,  EEP_RST,  _______, _______, _______, _______, RGB_TOG, RGB_RMOD, RGB_MOD, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, RGB_HUI, RGB_SAI, RGB_VAI,  _______,
-        _______, QWERTY, WORKMAN,  _______, _______, _______, _______, _______, RGB_HUD, RGB_SAD, RGB_VAD,  _______,
+        _______, RESET,   DEBUG,   EEP_RST, _______, _______, _______, _______, RGB_TOG, RGB_RMOD, RGB_MOD, _______,
+        ESC_BSP, _______, _______, _______, _______, _______, _______, _______, RGB_HUI, RGB_SAI, RGB_VAI,  _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, RGB_HUD, RGB_SAD, RGB_VAD,  _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,  _______),
 
     [_MOUSE] = LAYOUT_preonic_grid(
@@ -222,6 +233,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     jiggle_timer = timer_read();
                 }
             }
+            break;
+        case ESC_BSP:
+
             break;
         return false;
     }
@@ -302,8 +316,15 @@ void matrix_scan_user(void) {
         SEQ_TWO_KEYS(KC_D, KC_D) { SEND_STRING(SS_TAP(X_HOME) SS_DOWN(X_LSFT) SS_TAP(X_END) SS_UP(X_LSFT) SS_TAP(X_DEL)); }
         // vim gg
         SEQ_TWO_KEYS(KC_G, KC_G) { SEND_STRING(SS_DOWN(X_LCTL) SS_TAP(X_HOME) SS_UP(X_LCTL)); }
+        // tpye my usernames for me
+        SEQ_TWO_KEYS(KC_T, KC_J) { SEND_STRING("k81jomat"); }
+        SEQ_THREE_KEYS(KC_T, KC_J, KC_A) { SEND_STRING("k81jomat_admin"); }
+        // should I keep this?
+        SEQ_THREE_KEYS(KC_P, KC_W, KC_D) { SEND_STRING(SECRET); }
         // open camunda imported dir for businesskei in clipboard
-        SEQ_TWO_KEYS(KC_C, KC_O) { SEND_STRING(SS_LGUI(SS_TAP(X_R)) "\\\\p081\\ddmppl\\prod\\_camundaImported\\" SS_RCTL(SS_TAP(X_V)) SS_TAP(X_ENTER)); }
+        SEQ_THREE_KEYS(KC_C, KC_O, KC_P) { SEND_STRING(SS_LGUI(SS_TAP(X_R)) SS_DELAY(100) "\\\\p081\\ddmppl\\prod\\_camundaImported\\" SS_RCTL(SS_TAP(X_V)) SS_DELAY(50) SS_TAP(X_ENTER)); }
+        SEQ_THREE_KEYS(KC_C, KC_O, KC_T) { SEND_STRING(SS_LGUI(SS_TAP(X_R)) SS_DELAY(100) "\\\\p081\\ddmppl\\test\\_camundaImported\\" SS_RCTL(SS_TAP(X_V)) SS_DELAY(50) SS_TAP(X_ENTER)); }
+        SEQ_THREE_KEYS(KC_C, KC_O, KC_E) { SEND_STRING(SS_LGUI(SS_TAP(X_R)) SS_DELAY(100) "\\\\p081\\ddmppl\\entw\\_camundaImported\\" SS_RCTL(SS_TAP(X_V)) SS_DELAY(50) SS_TAP(X_ENTER)); }
     }
     // JIGGLE TIMER
     if (jiggler) {
